@@ -18,7 +18,7 @@ def pool_cmd(pool):
     cmd = "./config_image.sh --pools %s" %(pool)
     os.system(cmd)
 
-#Download img gz file
+# Download img gz file
 def download_img():
     conf = open("default.conf")
     for dl in conf.readlines():
@@ -42,7 +42,7 @@ def download_img():
     os.system(cmd)
     time.sleep(3)
 
-#Mount img file
+# Mount img file
 def mount_img():
     conf = open("default.conf")
     for mt in conf.readlines():
@@ -54,7 +54,7 @@ def mount_img():
             break
     conf.close()
 
-#Network
+# Network
 def network():
     conf = open("default.conf")
     for net in conf.readlines():
@@ -70,7 +70,7 @@ def network():
             break
     conf.close()
 
-#Timezone
+# Timezone
 def timezone():
     conf = open("default.conf")
     for time in conf.readlines():
@@ -82,7 +82,7 @@ def timezone():
             break
     conf.close()
 
-#Ntp server
+# Ntp server
 def ntp_server():
     conf = open("default.conf")
     for ntp in conf.readlines():
@@ -94,7 +94,7 @@ def ntp_server():
             ntp_cmd(ntp.strip())
     conf.close()
 
-#Pools Workers
+# Pools Workers
 def pools():
     conf = open("default.conf")
     for pool in conf.readlines():
@@ -106,7 +106,7 @@ def pools():
             pool_cmd(pool.strip())
     conf.close()
 
-#Umount img file
+# Umount img file
 def umount_img():
     os.system("./config_image.sh --umount")
 

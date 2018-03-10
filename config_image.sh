@@ -5,7 +5,20 @@
 #
 # Learn bash: http://explainshell.com/
 
-#Mount img file
+# Mount img file
+# Check offset value: fdisk -lu img.file
+# eg. fdisk -lu openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img
+# Output:
+# Disk openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img: 79 MB, 79691776 bytes
+# 255 heads, 63 sectors/track, 9 cylinders, total 155648 sectors
+# Units = sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disk identifier: 0x5452574f
+#
+#                                         Device Boot      Start         End      Blocks   Id  System
+# openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img1   *        8192       49151       20480    c  W95 FAT32 (LBA)
+# openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img2           57344      155647       49152   83  Lin
 mount_img() {
     echo "mount img file"
     
@@ -32,7 +45,7 @@ mount_img() {
     fi
 }
 
-#Network config
+# Network config
 network_config() {
     cd ./img/mount/etc/config
     
@@ -60,7 +73,7 @@ network_config() {
     fi
 }
 
-#Tiemzone config
+# Tiemzone config
 timezone_config() {
     cd ./img/mount/etc/config
 
@@ -68,7 +81,7 @@ timezone_config() {
     sudo sed -i 's?UTC?'$2'?g' ./system
 }
 
-#Ntp server config
+# Ntp server config
 ntp_config() {
     cd ./img/mount/etc/config
 	
@@ -87,11 +100,11 @@ ntp_config() {
     fi
 }
 
-#Pools config
+# Pools config
 pools_config() {
     cd ./img/mount/etc/config
 
-    #Pool1
+    # Pool1
     if [ "$1" == "pool1url" ]; then
         sudo sed -i "s?'stratum+tcp://stratum.kano.is:3333'?'$2'?g" ./cgminer
     elif [ "$1" == "pool1user" ]; then
@@ -100,7 +113,7 @@ pools_config() {
         sudo sed -i "s/option pool1pw          '1234'/option pool1pw          '$2'/g" ./cgminer
     fi
 
-    #Pool2
+    # Pool2
     if [ "$1" == "pool2url" ]; then
         sudo sed -i "s?'stratum+tcp://stratum80.kano.is:80'?'$2'?g" ./cgminer
     elif [ "$1" == "pool2user" ]; then
@@ -109,7 +122,7 @@ pools_config() {
         sudo sed -i "s/option pool2pw          '1234'/option pool2pw          '$2'/g" ./cgminer
     fi
 
-    #Pool3
+    # Pool3
     if [ "$1" == "pool3url" ]; then
         sudo sed -i "s?'stratum+tcp://stratum81.kano.is:81'?'$2'?g" ./cgminer
     elif [ "$1" == "pool3user" ]; then
@@ -119,7 +132,7 @@ pools_config() {
     fi
 }
 
-#Umount img file
+# Umount img file
 umount_img() {
     echo "umount img file"
     sleep 3
@@ -150,4 +163,4 @@ do
     esac
 done
 
-#vim: set ts=4 sw=4 et
+# vim: set ts=4 sw=4 et
