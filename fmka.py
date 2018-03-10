@@ -111,14 +111,11 @@ def umount_img():
     os.system("./config_image.sh --umount")
 
 if __name__ == "__main__":
-    try:
-        download_img()
-        mount_img()
-        network()
-        timezone()
-        ntp_server()
-        pools()
-        umount_img()
-        print("firmwae config success.")
-    except:
-        print("firmware config failed.")
+    download_img()
+    mount_img()
+    network()
+    timezone()
+    ntp_server()
+    pools()
+    umount_img()
+    print("firmwae config success.")
