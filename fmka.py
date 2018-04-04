@@ -6,6 +6,9 @@
 import os
 import time
 
+config_file = "openwrt.conf"
+
+'''
 def network_cmd(net):
     cmd = "./config_image.sh --network %s" %(net)
     os.system(cmd)
@@ -17,43 +20,13 @@ def ntp_cmd(ntp):
 def pool_cmd(pool):
     cmd = "./config_image.sh --pools %s" %(pool)
     os.system(cmd)
-
-# Download img gz file
-def download_img():
-    conf = open("default.conf")
-    for dl in conf.readlines():
-        if (dl.find('avalon_type') != -1):
-            if (dl[0] == '#'):
-                continue
-            dl = dl[len("avalon_type"):]
-            break
-    conf.close()
-
-    conf = open("default.conf")
-    for ctl in conf.readlines():
-        if (ctl.find('controller_type') != -1):
-            if (ctl[0] == '#'):
-                continue
-            ctl = ctl[len("controller_type"):]
-            break
-    conf.close()
-    img_type = dl.strip() + " " + ctl.strip()
-    cmd = "./download.sh %s" %(img_type)
-    os.system(cmd)
-    time.sleep(3)
+'''
 
 # Mount img file
 def mount_img():
-    conf = open("default.conf")
-    for mt in conf.readlines():
-        if (mt.find('controller_type') != -1):
-            if (mt[0] == '#'):
-                continue
-            cmd = "./config_image.sh --mount %s" %(mt.strip())
-            os.system(cmd)
-            break
-    conf.close()
 
+
+'''
 # Network
 def network():
     conf = open("default.conf")
@@ -105,17 +78,19 @@ def pools():
                 continue
             pool_cmd(pool.strip())
     conf.close()
+'''
 
 # Umount img file
 def umount_img():
     os.system("./config_image.sh --umount")
 
 if __name__ == "__main__":
-    download_img()
     mount_img()
+    '''
     network()
     timezone()
     ntp_server()
     pools()
+    '''
     umount_img()
     print("firmwae config success.")

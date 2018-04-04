@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env python3
+#
 # This is a script for creating user custom config img file
 #
 # October 2017 Zhenxing Xu <xuzhenxing@canaan-creative.com>
@@ -19,36 +20,27 @@
 #                                         Device Boot      Start         End      Blocks   Id  System
 # openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img1   *        8192       49151       20480    c  W95 FAT32 (LBA)
 # openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img2           57344      155647       49152   83  Lin
-mount_img() {
-    echo "mount img file"
-    
-    if [ ! -d ./img/mount ]; then
-        mkdir -p ./img/mount
-    else
-        rm -f ./img/openwrt*
-    fi
-    
-    if [ "$1" == "controller_type" ]; then
-        if [ "$2" == "rpi1" ]; then
-            cp ./avalon/openwrt-brcm2708-bcm2708-rpi-ext4-sdcard.img.gz ./img/
-            gzip -d ./img/openwrt-brcm2708-bcm2708-rpi-ext4-sdcard.img.gz 
-            sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2708-rpi-ext4-sdcard.img ./img/mount
-        elif [ "$2" == "rpi2" ]; then
-            cp ./avalon/openwrt-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz ./img/
-            gzip -d ./img/openwrt-brcm2708-bcm2709-rpi-2-ext4-sdcard.img.gz
-            sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2709-rpi-2-ext4-sdcard.img ./img/mount
-        elif [ "$2" == "rpi3" ]; then
-            cp ./avalon/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz ./img/
-            gzip -d ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
-            sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./img/mount
-        fi
-    fi
-}
 
-# Network config
-network_config() {
+from __future__ import print_function
+import subprocess
+import logging
+
+# Config logging level
+logging.basicConfig(level=logging.DEBUG)
+
+def mount_img():
+    logging.debug("mount img file")
+
+    subprocess.call("mkdir mount", shell=True)
+    subprocess.call("gzip -d openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz", shell=True)
+    subprocess.call("sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./mount", shell=True)
+
+def network_config():
+    logging.debug("network config")
+
+    '''
     cd ./img/mount/etc/config
-    
+
     if [ "$1" == "protocol" ]; then
         if [ "$2" == "dhcp" ]; then
             sudo sed -i '6,$ s/static/dhcp/g' ./network
@@ -71,20 +63,24 @@ network_config() {
             echo "parameter error."
         fi
     fi
-}
+    '''
 
-# Tiemzone config
-timezone_config() {
+def timezone_config():
+    logging.debug("timezone config")
+
+    '''
     cd ./img/mount/etc/config
 
     sudo sed -i 's/timezone/'$1'/g' ./system
     sudo sed -i 's?UTC?'$2'?g' ./system
-}
+    '''
 
-# Ntp server config
-ntp_config() {
+def ntp_config():
+    logging.debug("ntp config")
+
+    '''
     cd ./img/mount/etc/config
-	
+
     if [ "$1" == "ntp_server" ]; then
         if [ "$2" == "enable" ]; then
             sudo sed -i "s/option enable_server 0/option enable_server '1'/g" ./system
@@ -98,10 +94,12 @@ ntp_config() {
     elif [ "$1" == "candidates4" ]; then
         sudo sed -i 's/3.openwrt.pool.ntp.org/'$2'/g' ./system
     fi
-}
+    '''
 
-# Pools config
-pools_config() {
+def pools_config():
+    logging.debug("pools config")
+
+    '''
     cd ./img/mount/etc/config
 
     # Pool1
@@ -130,37 +128,9 @@ pools_config() {
     elif [ "$1" == "pool3pw" ]; then
         sudo sed -i "s/option pool3pw          '1234'/option pool3pw          '$2'/g" ./cgminer
     fi
-}
+    '''
 
-# Umount img file
-umount_img() {
-    echo "umount img file"
-    sleep 3
-    sudo umount ./img/mount
-}
-
-for i in "$1"
-do
-    case $i in
-        --mount)
-            mount_img $2 $3
-            ;;
-        --network)
-            network_config $2 $3
-            ;;
-        --timezone)
-            timezone_config $2 $3
-            ;;
-        --ntp)
-            ntp_config $2 $3
-            ;;
-        --pools)
-            pools_config $2 $3
-            ;;
-        --umount)
-            umount_img
-            ;;
-    esac
-done
-
-# vim: set ts=4 sw=4 et
+def umount_img():
+    logging.debug("umount img file")
+    subprocess.call("sudo umount ./mount", shell=True)
+    subprocess.call("rm -fr ./mount")
