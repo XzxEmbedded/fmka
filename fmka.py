@@ -28,109 +28,68 @@ import logging
 # Config logging level
 logging.basicConfig(level=logging.DEBUG)
 
+conf_file = "openwrt.conf"
+
 def mount_img():
     logging.debug("mount img file")
 
     subprocess.call("mkdir mount", shell=True)
-    subprocess.call("gzip -d openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz", shell=True)
-    subprocess.call("sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./mount", shell=True)
+    #subprocess.call("gzip -d openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz", shell=True)
+    subprocess.call("sudo mount -t auto -o loop,offset=$((57344*512)) ./openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./mount", shell=True)
 
 def network_config():
     logging.debug("network config")
 
-    '''
-    cd ./img/mount/etc/config
+    with open(conf_file) as conf:
+        for net in conf.readlines():
+            if (net.find('ipaddr') != -1) or (net.find('gateway') != -1) or (net.find('dns') != -1) or (net.find('broadcast') != -1):
+                if (net[0] == '#'):
+                    continue
+                tmp = net.strip()
+                print(tmp)
+            elif (net.find('dhcp') != -1):
+                if (net[0] == '#'):
+                    continue
+                tmp = net.strip()
+                break
 
-    if [ "$1" == "protocol" ]; then
-        if [ "$2" == "dhcp" ]; then
-            sudo sed -i '6,$ s/static/dhcp/g' ./network
-            sudo sed -i "/'netmask' '255.255.255.0'/d" ./network
-            sudo sed -i "/'ipaddr' '192.168.0.100'/d" ./network
-            sudo sed -i '/gateway/d' ./network
-            sudo sed -i '/dns/d' ./network
-            sudo sed -i '/broadcast/d' ./network
-        fi
-    else
-        if [ "$1" == "ipaddr" ]; then
-            sudo sed -i "s/option 'ipaddr' '192.168.0.100'/option 'ipaddr' '$2'/g" ./network
-        elif [ "$1" == "gateway" ]; then
-            sudo sed -i "s/option 'gateway' '192.168.0.1'/option 'gateway' '$2'/g" ./network
-        elif [ "$1" == "dns" ]; then
-            sudo sed -i "s/option dns '192.168.0.1'/option dns '$2'/g" ./network
-        elif [ "$1" == "broadcast" ]; then
-            sudo sed -i "s/option broadcast '192.168.0.255'/option broadcast '$2'/g" ./network
-        else
-            echo "parameter error."
-        fi
-    fi
+    '''
+    if (tmp[0] == "protocol"):
+        if (tmp[1] == "dhcp"):
+            subprocess.call("sudo sed -i '6,$ s/static/dhcp/g' ./mount/etc/config/network", shell=True)
+            subprocess.call("sudo sed -i "/'netmask' '255.255.255.0'/d" ./mount/etc/config/network", shell=True)
+            subprocess.call("sudo sed -i "/'ipaddr' '192.168.0.100'/d" ./mount/etc/config/network", shell=True)
+            subprocess.call("sudo sed -i '/gateway/d' ./mount/etc/config/network", shell=True)
+            subprocess.call("sudo sed -i '/dns/d' ./mount/etc/config/network", shell=True)
+            subprocess.call("sudo sed -i '/broadcast/d' ./mount/etc/config/network", shell=True)
+    else:
+        if (tmp[0] == "ipaddr"):
+            subprocess.call("sudo sed -i "s/option 'ipaddr' '192.168.0.100'/option 'ipaddr' 'tmp[1]'/g" ./mount/etc/config/network", shell=True)
+        elif (tmp[0] == "gateway"):
+            subprocess.call("sudo sed -i "s/option 'gateway' '192.168.0.1'/option 'gateway' 'tmp[1]'/g" ./mount/etc/config/network", shell=True)
+        elif (tmp[0] == "dns"):
+            subprocess.call("sudo sed -i "s/option dns '192.168.0.1'/option dns 'tmp[1]'/g" ./mount/etc/config/network", shell=True)
+        elif (tmp[0] == "broadcast"):
+            subprocess.call("sudo sed -i "s/option broadcast '192.168.0.255'/option broadcast '$2'/g" ./mount/etc/config/network", shell=True)
+        else:
+            logging.debug("parameter error.")
     '''
 
 def timezone_config():
     logging.debug("timezone config")
 
-    '''
-    cd ./img/mount/etc/config
-
-    sudo sed -i 's/timezone/'$1'/g' ./system
-    sudo sed -i 's?UTC?'$2'?g' ./system
-    '''
-
 def ntp_config():
     logging.debug("ntp config")
-
-    '''
-    cd ./img/mount/etc/config
-
-    if [ "$1" == "ntp_server" ]; then
-        if [ "$2" == "enable" ]; then
-            sudo sed -i "s/option enable_server 0/option enable_server '1'/g" ./system
-        fi
-    elif [ "$1" == "candidates1" ]; then
-        sudo sed -i 's/0.openwrt.pool.ntp.org/'$2'/g' ./system
-    elif [ "$1" == "candidates2" ]; then
-        sudo sed -i 's/1.openwrt.pool.ntp.org/'$2'/g' ./system
-    elif [ "$1" == "candidates3" ]; then
-        sudo sed -i 's/2.openwrt.pool.ntp.org/'$2'/g' ./system
-    elif [ "$1" == "candidates4" ]; then
-        sudo sed -i 's/3.openwrt.pool.ntp.org/'$2'/g' ./system
-    fi
-    '''
 
 def pools_config():
     logging.debug("pools config")
 
-    '''
-    cd ./img/mount/etc/config
-
-    # Pool1
-    if [ "$1" == "pool1url" ]; then
-        sudo sed -i "s?'stratum+tcp://stratum.kano.is:3333'?'$2'?g" ./cgminer
-    elif [ "$1" == "pool1user" ]; then
-        sudo sed -i "s/'canaan.3333'/'$2'/g" ./cgminer
-    elif [ "$1" == "pool1pw" ]; then
-        sudo sed -i "s/option pool1pw          '1234'/option pool1pw          '$2'/g" ./cgminer
-    fi
-
-    # Pool2
-    if [ "$1" == "pool2url" ]; then
-        sudo sed -i "s?'stratum+tcp://stratum80.kano.is:80'?'$2'?g" ./cgminer
-    elif [ "$1" == "pool2user" ]; then
-        sudo sed -i "s/'canaan.80'/'$2'/g" ./cgminer
-    elif [ "$1" == "pool2pw" ]; then
-        sudo sed -i "s/option pool2pw          '1234'/option pool2pw          '$2'/g" ./cgminer
-    fi
-
-    # Pool3
-    if [ "$1" == "pool3url" ]; then
-        sudo sed -i "s?'stratum+tcp://stratum81.kano.is:81'?'$2'?g" ./cgminer
-    elif [ "$1" == "pool3user" ]; then
-        sudo sed -i "s/'canaan.81'/'$2'/g" ./cgminer
-    elif [ "$1" == "pool3pw" ]; then
-        sudo sed -i "s/option pool3pw          '1234'/option pool3pw          '$2'/g" ./cgminer
-    fi
-    '''
-
 def umount_img():
     logging.debug("umount img file")
     subprocess.call("sudo umount ./mount", shell=True)
-    subprocess.call("rm -fr ./mount")
+    subprocess.call("rm -fr ./mount", shell=True)
+
+if __name__ == '__main__':
+    mount_img()
+    network_config()
+    umount_img()
