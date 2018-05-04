@@ -20,8 +20,6 @@
 # openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img1   *        8192       49151       20480    c  W95 FAT32 (LBA)
 # openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img2           57344      155647       49152   83  Lin
 
-[ -z "$PASSWORD" ] && PASSWORD="123"
-
 mount_img() {
     echo "mount img file"
     
@@ -43,7 +41,7 @@ mount_img() {
         elif [ "$2" == "rpi3" ]; then
             cp ./avalon/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz ./img/
             gzip -d ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
-            echo "$PASSWORD" | sudo -S mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./img/mount
+            sudo mount -t auto -o loop,offset=$((57344*512)) ./img/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img ./img/mount
         fi
     fi
 }
