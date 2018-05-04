@@ -23,8 +23,17 @@ elif [ "$1" == "avalon6" ] && [ "$2" == "rpi3" ]; then
     wget -P ./avalon https://canaan.io/downloads/software/avalon6/openwrt/latest/brcm2708/bcm2710/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
 
 # Avalon8
-elif [ "$1" == "avalon8" ] && [ "$2" == "rpi3" ]; then
+elif [ "$1" == "avalon821" ] && [ "$2" == "rpi3" ]; then
     [ -d ./avalon ] && rm ./avalon/*
     wget -P ./avalon https://canaan.io/downloads/software/avalon821/openwrt/latest/rpi3-modelb/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
+elif [ "$1" == "avalon831" ] && [ "$2" == "rpi3" ]; then
+    [ -d ./avalon ] && rm ./avalon/*
+    wget -P ./avalon https://canaan.io/downloads/software/avalon831/openwrt/latest/rpi3-modelb/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
+elif [ "$1" == "avalon841" ] && [ "$2" == "rpi3" ]; then
+    [ -d ./avalon ] && rm ./avalon/*
+    wget -P ./avalon https://canaan.io/downloads/software/avalon841/openwrt/latest/rpi3-modelb/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
+elif [ "$1" == "avalon851" ] && [ "$2" == "rpi3" ]; then
+    [ -d ./avalon ] && rm ./avalon/*
+    wget -P ./avalon https://canaan.io/downloads/software/avalon851/openwrt/latest/rpi3-modelb/openwrt-brcm2708-bcm2710-rpi-3-ext4-sdcard.img.gz
 
 fi
